@@ -12,29 +12,18 @@ using namespace std;
 void bim3a_advection_diffusion
 (Mesh& mesh, vector<double> alpha, vector<double> beta, sparse_matrix &A){
     
-    typedef vector<vector<vector<double>>> mat3d;
-    mat3d Aloc(8);
-    for(int i = 0; i < 8; i++){
-        Aloc[i].resize(8);
-        for(int j = 0; j < 8; j++){
-            Aloc[i][j].resize(mesh.nelem);
-        }
-    }
+    typedef vector< vector< vector<double> > > mat3d;
+    mat3d Aloc(8, vector< vector<double> >(8, vector<double>(mesh.nelem)));
     
-    vector< vector<double> > x(mesh.nelem);
-    vector< vector<double> > y(mesh.nelem);
-    vector< vector<double> > z(mesh.nelem);
+    vector< vector<double> > x(mesh.nelem, vector<double>(8));
+    vector< vector<double> > y(mesh.nelem, vector<double>(8));
+    vector< vector<double> > z(mesh.nelem, vector<double>(8));
     
-    for(int m = 0; m < mesh.nelem; m++){
-        x[m].resize(8,0);
-        y[m].resize(8,0);
-        z[m].resize(8,0);
-    }
     for(int k = 0; k < mesh.nelem; k++){
         for(int m = 0; m < 8; m++){
-            x[m][k] = mesh.p(0,mesh.t(m,k));
-            y[m][k] = mesh.p(1,mesh.t(m,k));
-            z[m][k] = mesh.p(2,mesh.t(m,k));            
+            x[k][m] = mesh.p(0, mesh.t(m,k) );
+            y[k][m] = mesh.p(1, mesh.t(m,k) );
+            z[k][m] = mesh.p(2, mesh.t(m,k) );            
         }
     }
     
