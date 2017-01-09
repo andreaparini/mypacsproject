@@ -18,11 +18,12 @@
 #include <vector>
 #include "quadmesh.hpp"
 using namespace std;
+
 bool isequal(int i, int j){
     return(i==j);
 }
 
-vector<int> msh3m_nodes_on_faces(Mesh M, const vector<int> facelist){
+vector<int> msh3m_nodes_on_faces(Mesh& M, const vector<int> facelist){
     
     
     vector<int> facefaces;
