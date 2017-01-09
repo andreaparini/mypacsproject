@@ -13,7 +13,6 @@
 
 
 
-#include "../include/GetPot.hpp"
 
 #include "../include/quadmesh.hpp"
 #include "../include/msh3m_nodes_on_faces.hpp"
@@ -33,6 +32,7 @@
 #include <sstream>
 #include <fstream>
 #include <functional>
+#include <iterator>
 
 /*
  * 
@@ -41,8 +41,6 @@ using namespace std;
 
 int main(int argc, char** argv) {
         
-    
-    GetPot cl(argc, argv);
     
     // set mesh parameters
     
@@ -60,7 +58,7 @@ int main(int argc, char** argv) {
     
     const double     alpha = 1.0;
     
-    const double     beta1 = 1.0;
+    const double     beta1 = 0.0;
     const double     beta2 = 0.0;
     const double     beta3 = 0.0;
     
@@ -105,7 +103,8 @@ int main(int argc, char** argv) {
     vector<double> g(mesh.nnodes);
     
     for(int j = 0; j < mesh.nnodes; j++){
-        g[j] = cos( 2*ynodes[j] ) * cos( znodes[j] ) *( cos(xnodes[j]) + 6*sin(xnodes[j]) );
+        g[j] = 1;
+        //g[j] = cos( 2*ynodes[j] ) * cos( znodes[j] ) *( cos(xnodes[j]) + 6*sin(xnodes[j]) );
     }
     
     // define dirichlet side list
@@ -124,16 +123,24 @@ int main(int argc, char** argv) {
     
     // set the non border nodes
     vector<int> Varnodes;
-    set_difference(Nnodes.begin(),Nnodes.end(), Dnodes.begin(), Dnodes.end(), Varnodes.begin());
+    set_difference(Nnodes.begin(),Nnodes.end(), Dnodes.begin(), Dnodes.end(),
+                   std::inserter(Varnodes, Varnodes.begin()) );
     
     // define A and rhs
     sparse_matrix A;
     bim3a_structure(mesh, A);
     
     bim3a_advection_diffusion(mesh, alpha_values, beta, A);
+    cout << "MATRICE A"<< endl;
+    cout << A;
     
-    vector<double> rhs(mesh.nelem,0);
+    vector<double> rhs(mesh.nnodes,0);
     bim3a_rhs(mesh, f, g, rhs);
+    cout << "VETTORE RHS" << endl;
+    
+    for(size_t k = 0; k< rhs.size(); k++){
+        cout << k << " " << rhs[k] << endl;
+    }
     
     //converting sparse matrix to aij format
     
