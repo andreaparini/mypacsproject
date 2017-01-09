@@ -23,7 +23,7 @@
  * Testing quadmesh.cpp function
  */
 void test(double L1, double L2, double H1, double H2, double W1, double W2,
-           unsigned Nx, unsigned Ny, unsigned Nz, unsigned region, vector <unsigned int> sides) {
+           int Nx, int Ny, int Nz, int region, vector <int> sides) {
     
     Mesh mesh(L1, L2, H1, H2, W1, W2, Nx, Ny, Nz, region, sides);
         
@@ -33,14 +33,14 @@ void test(double L1, double L2, double H1, double H2, double W1, double W2,
     std::cout << "printing to mesh.txt file" << std::endl;
     std::cout << "printing mesh nodes coordinates" << std::endl;
         
-    for (size_t j = 0; j < mesh.nnodes; j++){
+    for (int j = 0; j < mesh.nnodes; j++){
         
         fout << mesh.p(0,j) << "\t" << mesh.p(1,j) << "\t" << mesh.p(2,j) << "\t" << std::endl;
     }
         
     std::cout << "printing cubes vertexes" << std::endl;
         
-    for (size_t k = 0; k < mesh.nelem; k++){
+    for (int k = 0; k < mesh.nelem; k++){
     
         fout << k << "\t" << mesh.t(0,k) << "\t" << mesh.t(1,k) << "\t" << mesh.t(2,k) << "\t" << mesh.t(3,k) << "\t"
                           << mesh.t(4,k) << "\t" << mesh.t(5,k) << "\t" << mesh.t(6,k) << "\t" << mesh.t(7,k) << std::endl;
@@ -48,7 +48,7 @@ void test(double L1, double L2, double H1, double H2, double W1, double W2,
         
     std::cout << "printing border faces nodes indexes" << std::endl;
         
-    for (size_t i = 0; i < 2*(mesh.Nx + mesh.Ny + mesh.Nz); i++){
+    for (int i = 0; i < 2*(mesh.Nx*mesh.Ny + mesh.Ny*mesh.Nz + mesh.Nx*mesh.Nz); i++){
         
         fout << i << "\t" << mesh.e(0,i) << "\t" << mesh.e(1,i) << "\t" << mesh.e(2,i) << "\t" << mesh.e(3,i) 
                           << "\t side = " << mesh.e(9,i) << std::endl;
@@ -92,11 +92,11 @@ int main(int argc, char** argv) {
         const double     H2 = 1;
         const double     W1 = 0;
         const double     W2 = 1;
-        const unsigned   Nx = 10;
-        const unsigned   Ny = 10;
-        const unsigned   Nz = 10;
-        const unsigned region = 1;
-        vector<unsigned int> sides;
+        const int        Nx = 10;
+        const int        Ny = 10;
+        const int        Nz = 10;
+        const int        region = 1;
+        vector<int> sides;
         sides.push_back(1);
         sides.push_back(2);
         sides.push_back(3);
@@ -121,11 +121,11 @@ int main(int argc, char** argv) {
         const double     H2 = 1;
         const double     W1 = 0;
         const double     W2 = 0.5;
-        const unsigned   Nx = 20;
-        const unsigned   Ny = 10;
-        const unsigned   Nz = 5;
-        const unsigned region = 1;
-        vector<unsigned int> sides;
+        const int        Nx = 20;
+        const int        Ny = 10;
+        const int        Nz = 5;
+        const int        region = 1;
+        vector<int> sides;
         sides.push_back(1);
         sides.push_back(2);
         sides.push_back(3);

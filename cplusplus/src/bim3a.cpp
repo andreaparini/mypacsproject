@@ -4,20 +4,24 @@
  * and open the template in the editor.
  */
 
-/* 
- * File:   bernoulli.hpp
- * Author: pacs_student
- *
- * Created on December 13, 2016, 12:21 PM
- */
 
-#ifndef BERNOULLI_HPP
-#define BERNOULLI_HPP
+#include "../include/bim3a.hpp"
 
-#include <vector>
-#include <cmath>
-#include <limits>
-using namespace std;
+
+void
+bim3a_structure (const Mesh& msh, sparse_matrix& SG)
+{
+  SG.resize (msh.nnodes);
+  for (int iel = 0; iel < msh.nelem; ++iel)
+    for (int inode = 0; inode < 4; ++inode)
+      for (int jnode = 0; jnode < 4; ++jnode)
+        {
+          int ig = msh.t (inode, iel);
+          int jg = msh.t (jnode, iel);
+          SG[ig][jg] = 0.0;
+        }
+  SG.set_properties ();
+};
 
 void bernoulli (vector<double>& bp, vector<double>& bn, vector<double> x){
     
@@ -71,6 +75,3 @@ void bernoulli (vector<double>& bp, vector<double>& bn, vector<double> x){
     
     
 }
-
-#endif /* BERNOULLI_HPP */
-

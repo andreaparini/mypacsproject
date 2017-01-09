@@ -16,33 +16,35 @@
 
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
 class Mesh
 {
 public:
-    const double hx;
-    const double hy;
-    const double hz;
+    
     const double L;
     const double H;
     const double W;
-    const unsigned int Nx;
-    const unsigned int Ny;
-    const unsigned int Nz;
-    const unsigned int nnodes;
-    const unsigned int nelem;
+    const int Nx;
+    const int Ny;
+    const int Nz;
+    const double hx;
+    const double hy;
+    const double hz;
+    const int nnodes;
+    const int nelem;
     double *p_data;
-    unsigned int *e_data;
-    unsigned int *t_data;
-    const unsigned int region;
-    vector<unsigned int> sides;
+    int *e_data;
+    int *t_data;
+    const int region;
+    vector<int> sides;
     
     Mesh
     (const double L1, const double L2, const double H1, const double H2,
-     const double W1, const double W2, const unsigned int Nx, const unsigned int Ny,
-     const unsigned int Nz, const unsigned int region, vector<unsigned int> sides);
+     const double W1, const double W2, const int Nx, const int Ny,
+     const int Nz,    const int region, vector<int> sides);
     
     ~Mesh();
     
@@ -53,13 +55,13 @@ public:
     };
     
     // accessing t data
-    inline unsigned int&
+    inline int&
     t(int inode, int iel){
         return (*(t_data + inode + 9*iel));
     };
     
     // accessing e data
-    inline unsigned int&
+    inline int&
     e(int i, int iface){
         return (*(e_data + i + 11*iface));
     };
@@ -71,13 +73,13 @@ public:
     };
     
     // accessing t data (const version)
-    inline const unsigned int&
+    inline const int&
     t(int inode, int iel) const{
         return (*(t_data + inode + 9*iel));
     };
     
     // accessing e data (const version
-    inline const unsigned int&
+    inline const int&
     e(int i, int iface) const{
         return (*(e_data + i + 11*iface));
     };
@@ -85,7 +87,7 @@ public:
     // takes a vector v as input and returns a vector w in which 
     // w[i] contains the index of the position j in which v[i] 
     // would be in the sorted v vector
-    vector<unsigned int> sort_indexes(const vector<unsigned int> &v);
+    vector <int> sort_indexes(const vector<int> &v);
     
     
 };
