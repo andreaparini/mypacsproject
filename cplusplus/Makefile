@@ -71,67 +71,29 @@
 #
 # NOCDDL
 
-
-# Environment 
-MKDIR=mkdir
-CP=cp
-CCADMIN=CCadmin
-RANLIB=ranlib
-
-
-# build
-build: .build-post
-
-.build-pre:
-# Add your pre 'build' code here...
-
-.build-post: .build-impl
-# Add your post 'build' code here...
+CCC = g++
+CXX = g++
+CXXFLAGS = -std=c++11 -Wall -g
+LDIR = lib
+LIBS = -L$(LDIR) -ldmumps -lmumps_common -lblas -lgfortran -lmpiseq -pthread -lpord
 
 
-# clean
-clean: .clean-post
+all : main
+	
 
-.clean-pre:
-# Add your pre 'clean' code here...
-
-.clean-post: .clean-impl
-# Add your post 'clean' code here...
+main : bim3a_advection_diffusion.o bim3a_rhs.o bim_sparse.o main.o mumps_class.o mumps_solve.o quadmesh.o bim3a.o
+	$(CXX) -o $@ $^ $(CXXFLAGS) $(LIBS)
 
 
-# clobber
-clobber: .clobber-post
+#quadmesh.o : quadmesh.cpp
+#	$(CXX) -c -o quadmesh.o ../src/quadmesh.cpp $(CXXFLAGS) 
+	
+%.o : src/%.cpp
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-.clobber-pre:
-# Add your pre 'clobber' code here...
-
-.clobber-post: .clobber-impl
-# Add your post 'clobber' code here...
-
-
-# all
-all: .all-post
-
-.all-pre:
-# Add your pre 'all' code here...
-
-.all-post: .all-impl
-# Add your post 'all' code here...
+#### Clean target deletes all generated files ####
+clean:
+	rm -f *.o main
+	#rm -f bim3a_advection_diffusion.o bim3a_rhs.o bim_sparse.o main.o mumps_class.o mumps_solve.o quadmesh.o bim3a.o main 
 
 
-# help
-help: .help-post
-
-.help-pre:
-# Add your pre 'help' code here...
-
-.help-post: .help-impl
-# Add your post 'help' code here...
-
-
-
-# include project implementation makefile
-include nbproject/Makefile-impl.mk
-
-# include project make variables
-include nbproject/Makefile-variables.mk
