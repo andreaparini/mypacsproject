@@ -12,19 +12,26 @@ using namespace std;
 void bim3a_advection_diffusion
 (Mesh& mesh, vector<double> alpha, vector<double> beta, sparse_matrix &A){
     
-    double*** Aloc = new double[8][8][mesh.nelem];
+    typedef vector<vector<vector<double>>> mat3d;
+    mat3d Aloc(8);
+    for(int i = 0; i < 8; i++){
+        Aloc[i].resize(8);
+        for(int j = 0; j < 8; j++){
+            Aloc[i][j].resize(mesh.nelem);
+        }
+    }
     
     vector< vector<double> > x(mesh.nelem);
     vector< vector<double> > y(mesh.nelem);
     vector< vector<double> > z(mesh.nelem);
     
-    for(size_t m = 0; m < mesh.nelem; m++){
+    for(int m = 0; m < mesh.nelem; m++){
         x[m].resize(8,0);
         y[m].resize(8,0);
         z[m].resize(8,0);
     }
-    for(size_t k = 0; k < mesh.nelem; k++){
-        for(size_t m = 0; m < 8; m++){
+    for(int k = 0; k < mesh.nelem; k++){
+        for(int m = 0; m < 8; m++){
             x[m][k] = mesh.p(0,mesh.t(m,k));
             y[m][k] = mesh.p(1,mesh.t(m,k));
             z[m][k] = mesh.p(2,mesh.t(m,k));            
@@ -44,7 +51,7 @@ void bim3a_advection_diffusion
     vector <double> psi87(mesh.nelem);
     vector <double> psi58(mesh.nelem);
     
-    for (size_t k = 0; k < mesh.nelem; k++){
+    for (int k = 0; k < mesh.nelem; k++){
         psi12[k] = beta[0]* (x[k][1] - x[k][0]) +
                    beta[1]* (y[k][1] - y[k][0]) +
                    beta[2]* (z[k][1] - z[k][0]);
@@ -133,7 +140,7 @@ void bim3a_advection_diffusion
     bernoulli(bp87,bm87,psi87);
     bernoulli(bp58,bm58,psi58);
     
-    for (size_t k = 0; k < mesh.nelem; k++){
+    for (int k = 0; k < mesh.nelem; k++){
         bp12[k] *= alpha[k] * mesh.hy * mesh.hz / (4 * mesh.hx);
         bm12[k] *= alpha[k] * mesh.hy * mesh.hz / (4 * mesh.hx);
         bp23[k] *= alpha[k] * mesh.hx * mesh.hz / (4 * mesh.hy);
@@ -191,7 +198,7 @@ void bim3a_advection_diffusion
         Aloc[5][1][k] = -bm26[k];
         Aloc[5][4][k] = -bm56[k];
         Aloc[5][5][k] = bp56[k] + bp26[k] + bm67[k];
-        Aloc[5][6][k] = -bp67;
+        Aloc[5][6][k] = -bp67[k];
         
         Aloc[6][2][k] = -bm37[k];
         Aloc[6][5][k] = -bm67[k];
@@ -203,19 +210,12 @@ void bim3a_advection_diffusion
         Aloc[7][6][k] = -bp87[k];
         Aloc[7][7][k] = bp48[k] + bp58[k] + bm87[k];
         
-        for(size_t ii = 0; ii < 8; ii++){
-            for(size_t jj = 0; jj < 8; jj++){
+        for(int ii = 0; ii < 8; ii++){
+            for(int jj = 0; jj < 8; jj++){
                 A[ mesh.t(ii,k) ][ mesh.t(jj,k) ] += Aloc[ii][jj][k];
             }
         }
         
     }
-    for(size_t i = 0; i < 8; i++){
-        for(size_t j = 0; j < 8; j++){
-            delete [] Aloc[i][j];
-        }
-        delete[] Aloc[i];
-    }
-    delete[] Aloc;
     
 }

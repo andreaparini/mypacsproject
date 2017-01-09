@@ -91,7 +91,7 @@ sparse_matrix::extract_block_pointer_keep_cols
     ordcol.insert (cols[jj]);
 
   for (ii = 0; ii < rows.size (); ++ii)
-    if ((rows[ii] < (*this).rows ()))
+    if ((rows[ii] < int( (*this).rows () )))
       {
         irow = &((*this)[rows[ii]]);
         if (irow->size ())

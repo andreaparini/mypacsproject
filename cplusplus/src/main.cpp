@@ -11,13 +11,21 @@
  * Created on December 13, 2016, 6:46 PM
  */
 
+
+
+#include "../include/GetPot.hpp"
+
 #include "../include/quadmesh.hpp"
 #include "../include/msh3m_nodes_on_faces.hpp"
-#include "../include/GetPot.hpp"
-#include "../muparser-2.2.5/include/muParser.h"
+
 #include "../include/bim3a.hpp"
 #include "../include/bim_sparse.hpp"
+
+#include "../include/bim3a_advection_diffusion.hpp"
+#include "../include/bim3a_rhs.hpp"
+
 #include "../include/mumps_class.h"
+
 #include <cstdlib>
 #include <algorithm>
 #include <vector>
@@ -38,51 +46,33 @@ int main(int argc, char** argv) {
     
     // set mesh parameters
     
-    const double     L1 = cl("-L1", 0.0);
-    const double     L2 = cl(2, "-L", "-L2", 1.0);
-    const double     H1 = cl("-H1", 0.0);
-    const double     H2 = cl(2, "-H", "-H2", 1.0);    
-    const double     W1 = cl("-W1", 0.0);
-    const double     W2 = cl(2, "-W", "-W2", 1.0);    
-    const unsigned   Nx = cl("-Nx", 20);
-    const unsigned   Ny = cl("-Ny", 20);
-    const unsigned   Nz = cl("-Nz", 20);
+    const double     L1 = 0;
+    const double     L2 = 1;
+    const double     H1 = 0;
+    const double     H2 = 1;    
+    const double     W1 = 0;
+    const double     W2 = 1;    
+    const int        Nx = 20;
+    const int        Ny = 20;
+    const int        Nz = 20;
     
     // set equation parameters
     
-    const string     alpha_ = cl(2, "-a", "--alpha", "1.0");
+    const double     alpha = 1.0;
     
-    const double     beta1 = cl(2, "-b", "--beta", 1.0, 0);
-    const double     beta2 = cl(2, "-b", "--beta", 0.0, 1);
-    const double     beta3 = cl(2, "-b", "--beta", 0.0, 2);
+    const double     beta1 = 1.0;
+    const double     beta2 = 0.0;
+    const double     beta3 = 0.0;
+    
+    
     
     const vector <double> beta = {beta1, beta2, beta3};
     
-    const string     f_ = cl("-f", "1.0");
-    const string     g_ = cl("-g", "cos(2*y) * cos(z) *(cos(x) + 6*sin(x)");
     
-    coefficient      alpha( alpha_ );
-    coefficient      f(f_);
-    coefficient      g(g_);
-    
-    
-    
-    // set Dirichlet sidelist
-    
-    const string     dir_sides_input = cl(3,"-d", "-s", "--sidelist", "1 2");
-    stringstream     iss(dir_sides_input);
-
-    const unsigned   side;
-    vector<unsigned> dir_sidelist;
-
-    while(iss >> side){
-        dir_sidelist.push_back(side);
-    }
-    
-    const unsigned  region = cl(2, "-r", "--region", 1);
+    const int        region = 1;
     
     // set default cube faces
-    vector <unsigned int> sides;  //{left,right,front,back,bottom,top} // change to runtime defined
+    vector <int> sides;  //{left,right,front,back,bottom,top} // change to runtime defined
     sides.push_back(1);
     sides.push_back(2);
     sides.push_back(3);
@@ -93,24 +83,47 @@ int main(int argc, char** argv) {
     // define mesh
     Mesh mesh(L1, L2, H1, H2, W1, W2, Nx, Ny, Nz, region, sides);
     
+    // define alpha vector
+    vector<double> alpha_values(mesh.nelem);
+    for(int k = 0; k < mesh.nelem; k++){
+        alpha_values[k] = alpha;
+    }
     
-    vector<double> f_values (mesh.nelem);
-    vector<double> g_values (mesh.nnodes);
-    vector<double> alpha_values (mesh.nelem);
+    // define nodes coordinates
+    vector<double> xnodes(mesh.nnodes);
+    vector<double> ynodes(mesh.nnodes);
+    vector<double> znodes(mesh.nnodes);
     
-    f.get_element_values(mesh, f, f_values);
-    g.get_nodes_values(mesh, g, g_values);
-    alpha.get_element_values(mesh, alpha, alpha_values);    
+    for(int j = 0; j < mesh.nnodes; j++){
+        xnodes[j] = mesh.p(0,j);
+        ynodes[j] = mesh.p(1,j);
+        znodes[j] = mesh.p(2,j);
+    }
+    
+    // define forcing
+    vector<double> f(mesh.nelem, 1.0);
+    vector<double> g(mesh.nnodes);
+    
+    for(int j = 0; j < mesh.nnodes; j++){
+        g[j] = cos( 2*ynodes[j] ) * cos( znodes[j] ) *( cos(xnodes[j]) + 6*sin(xnodes[j]) );
+    }
+    
+    // define dirichlet side list
+    vector<int> dir_sidelist;
+    dir_sidelist.push_back(1);
+    dir_sidelist.push_back(2);
     
     // set Dirichlet nodes indexes
-    vector<unsigned int> Dnodes = msh3m_nodes_on_faces(mesh, dir_sidelist);
-    sort(Dnodes.begin(), Dnodes.end);
+    vector<int> Dnodes = msh3m_nodes_on_faces(mesh, dir_sidelist);
+    sort(Dnodes.begin(), Dnodes.end());
     
-    vector<unsigned int> Nnodes(mesh.nelem,0);
-    iota(Nnodes.begin(),Nnodes.end(),0);
+    vector<int> Nnodes;
+    for(int k = 0; k < mesh.nnodes; k++){
+        Nnodes.push_back(k);
+    }
     
     // set the non border nodes
-    vector<unsigned int> Varnodes();
+    vector<int> Varnodes;
     set_difference(Nnodes.begin(),Nnodes.end(), Dnodes.begin(), Dnodes.end(), Varnodes.begin());
     
     // define A and rhs
@@ -120,7 +133,7 @@ int main(int argc, char** argv) {
     bim3a_advection_diffusion(mesh, alpha_values, beta, A);
     
     vector<double> rhs(mesh.nelem,0);
-    bim3a_rhs(mesh, f_values, g_values, rhs);
+    bim3a_rhs(mesh, f, g, rhs);
     
     //converting sparse matrix to aij format
     
@@ -149,7 +162,7 @@ int main(int argc, char** argv) {
     std::ofstream fout ("solution.txt");
     fout << std::endl;
 
-    for (unsigned int k = 0; k < rhs.size (); ++k){
+    for (size_t k = 0; k < rhs.size (); ++k){
         
         fout << rhs[k] << std::endl;
     }
