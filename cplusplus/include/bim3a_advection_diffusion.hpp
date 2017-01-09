@@ -15,14 +15,14 @@
 #define BIM3A_ADVECTION_DIFFUSION_HPP
 
 #include "quadmesh.hpp"
-#include "bernoulli.hpp"
 #include "bim3a.hpp"
 #include "bim_sparse.hpp"
 #include <vector>
+
 using namespace std;
 
 void bim3a_advection_diffusion
-(Mesh& mesh, coefficient alpha, vector<double> beta, sparse_matrix &A);;
+(Mesh& mesh, vector<double> alpha, vector<double> beta, sparse_matrix &A);;
 
 #endif /* BIM3A_ADVECTION_DIFFUSION_HPP */
 

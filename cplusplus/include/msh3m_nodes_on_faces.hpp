@@ -22,21 +22,21 @@ bool isequal(int i, int j){
     return(i==j);
 }
 
-vector<unsigned int> msh3m_nodes_on_faces(Mesh M, const vector<unsigned int> facelist){
+vector<int> msh3m_nodes_on_faces(Mesh M, const vector<int> facelist){
     
     
-    vector<unsigned int> facefaces;
+    vector<int> facefaces;
     for (size_t k = 0; k < facelist.size(); k++){
-        for (size_t j = 0; j < 2*M.Nx + 2*M.Ny + 2*M.Nz; j++){
-            if (M.e[9][j] == facelist[k]){
-                facelist.push_back(j);
+        for (int j = 0; j < 2*M.Nx + 2*M.Ny + 2*M.Nz; j++){
+            if (M.e(9,j) == facelist[k]){
+                facefaces.push_back(j);
             }
         }
     }
-    vector<unsigned int> facenodes;
-    for (size_t i = 0; i < 4; i++){
-        for (size_t j = 0; j < facelist.size(); j++){
-            facenodes.push_back(M.e[i][facelist(j)]);
+    vector<int> facenodes;
+    for (int i = 0; i < 4; i++){
+        for (size_t j = 0; j < facefaces.size(); j++){
+            facenodes.push_back(M.e(i, facefaces[j]));
         }
     }
     unique(facenodes.begin(), facenodes.end(), isequal);
