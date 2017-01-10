@@ -51,14 +51,14 @@ int main(int argc, char** argv) {
     const double     W1 = 0;
     const double     W2 = 1;    
     const int        Nx = 20;
-    const int        Ny = 20;
-    const int        Nz = 20;
+    const int        Ny = 10;
+    const int        Nz = 10;
     
     // set equation parameters
     
     const double     alpha = 1.0;
     
-    const double     beta1 = 0.0;
+    const double     beta1 = 1.0;
     const double     beta2 = 0.0;
     const double     beta3 = 0.0;
     
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     vector<double> g(mesh.nnodes);
     
     for(int j = 0; j < mesh.nnodes; j++){
-        g[j] = 1;
+        g[j] = 1.0;
         //g[j] = cos( 2*ynodes[j] ) * cos( znodes[j] ) *( cos(xnodes[j]) + 6*sin(xnodes[j]) );
     }
     
@@ -114,33 +114,38 @@ int main(int argc, char** argv) {
     
     // set Dirichlet nodes indexes
     vector<int> Dnodes = msh3m_nodes_on_faces(mesh, dir_sidelist);
-    sort(Dnodes.begin(), Dnodes.end());
     
-    vector<int> Nnodes;
-    for(int k = 0; k < mesh.nnodes; k++){
-        Nnodes.push_back(k);
+    
+    // set boundary conditions
+    vector<double> Vnodes(Dnodes.size(),0);
+    for (size_t j = 0; j < Vnodes.size(); j++){
+        if(mesh.p(0,Dnodes[j]) == L1){
+            Vnodes[j] = 0;
+        }
+        if(mesh.p(0,Dnodes[j]) == L2){
+            Vnodes[j] = 0;
+        }
     }
     
-    // set the non border nodes
-    vector<int> Varnodes;
-    set_difference(Nnodes.begin(),Nnodes.end(), Dnodes.begin(), Dnodes.end(),
-                   std::inserter(Varnodes, Varnodes.begin()) );
     
     // define A and rhs
     sparse_matrix A;
     bim3a_structure(mesh, A);
     
     bim3a_advection_diffusion(mesh, alpha_values, beta, A);
-    cout << "MATRICE A"<< endl;
-    cout << A;
+    
+//    cout << "MATRICE A"<< endl;
+//    cout << A;
     
     vector<double> rhs(mesh.nnodes,0);
     bim3a_rhs(mesh, f, g, rhs);
-    cout << "VETTORE RHS" << endl;
     
-    for(size_t k = 0; k< rhs.size(); k++){
-        cout << k << " " << rhs[k] << endl;
-    }
+//    cout << "VETTORE RHS" << endl;
+//    for(size_t k = 0; k< rhs.size(); k++){
+//        cout << k << " " << rhs[k] << endl;
+//    }
+    
+    bim3a_dirichlet_bc(A, rhs, Dnodes, Vnodes);
     
     //converting sparse matrix to aij format
     
