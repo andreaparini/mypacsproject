@@ -71,7 +71,48 @@ void bernoulli (vector<double>& bp, vector<double>& bn, vector<double> x){
         bp[i] = bp_tmp;
         bn[i] = bn_tmp;
     }
-    
-    
-    
+        
 }
+
+
+void
+bim3a_dirichlet_bc (sparse_matrix& M, std::vector<double>& b, 
+                    const std::vector<int>& bnodes, const std::vector<double>& vnodes){
+    
+    sparse_matrix::col_iterator j;
+    
+    for (unsigned int it = 0; it < bnodes.size (); ++it){
+    
+        int i = bnodes[it];
+        b[i] = vnodes[it];
+        
+        if (M[i].size ()){
+            for (j = M[i].begin (); j != M[i].end (); ++j){
+            
+                int jj = M.col_idx (j);
+                if (jj != i){
+                
+                    M[i][jj] = 0.0;
+                    b[jj] -= M[jj][i] * b[i];
+                    M[jj][i] = 0.0;
+                }
+            }
+            b[i] *= M[i][i];
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

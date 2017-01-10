@@ -31,6 +31,13 @@ bim3a_structure (const Mesh& msh, sparse_matrix& SG);
 void 
 bernoulli (vector<double>& bp, vector<double>& bn, vector<double> x);
 
+void
+bim3a_dirichlet_bc (sparse_matrix& M,
+                    std::vector<double>& b,
+                    const std::vector<int>& bnodes,
+                    const std::vector<double>& vnodes);
+
+
 
 #endif /* BIM3A_HPP */
 
