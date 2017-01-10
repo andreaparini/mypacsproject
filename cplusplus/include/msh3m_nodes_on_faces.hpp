@@ -19,16 +19,12 @@
 #include "quadmesh.hpp"
 using namespace std;
 
-bool isequal(int i, int j){
-    return(i==j);
-}
-
 vector<int> msh3m_nodes_on_faces(Mesh& M, const vector<int> facelist){
     
     
     vector<int> facefaces;
     for (size_t k = 0; k < facelist.size(); k++){
-        for (int j = 0; j < 2*M.Nx + 2*M.Ny + 2*M.Nz; j++){
+        for (int j = 0; j < 2*M.Nx*M.Ny + 2*M.Ny*M.Nz + 2*M.Nx*M.Nz; j++){
             if (M.e(9,j) == facelist[k]){
                 facefaces.push_back(j);
             }
@@ -40,7 +36,11 @@ vector<int> msh3m_nodes_on_faces(Mesh& M, const vector<int> facelist){
             facenodes.push_back(M.e(i, facefaces[j]));
         }
     }
-    unique(facenodes.begin(), facenodes.end(), isequal);
+    sort(facenodes.begin(), facenodes.end());
+    auto last = unique(facenodes.begin(), facenodes.end());
+    facenodes.erase(last, facenodes.end());
+    
+    
     
     return facenodes;
 }
