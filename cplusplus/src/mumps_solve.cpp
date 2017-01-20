@@ -8,8 +8,8 @@
   \brief wrapper function for a complete linear system solution.
 */
 
-#include "../include/mumps_class.h"
-#include "../include/mumps_solve.h"
+#include <mumps_solve.h>
+#include <mumps_class.h>
 
 void
 mumps_solve (sparse_matrix &lhs,

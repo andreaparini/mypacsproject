@@ -1,15 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/*
   Copyright (C) 2011,2016 Carlo de Falco
   This software is distributed under the terms
   the terms of the GNU/GPL licence v3
 */
 
-#include "../include/bim_sparse.hpp"
+#include "bim_sparse.h"
 
 //using namespace bim;
 
@@ -91,7 +86,7 @@ sparse_matrix::extract_block_pointer_keep_cols
     ordcol.insert (cols[jj]);
 
   for (ii = 0; ii < rows.size (); ++ii)
-    if ((rows[ii] < int( (*this).rows () )))
+    if ((rows[ii] < (*this).rows ()))
       {
         irow = &((*this)[rows[ii]]);
         if (irow->size ())
@@ -110,8 +105,8 @@ void sparse_matrix::reset ()
 {
   double_sparse_matrix::row_iterator ii;
   double_sparse_matrix::col_iterator jj;
-  for (ii = this->begin(); ii != this->end(); ++ii)
-    for (jj = (*ii).begin(); jj != (*ii).end(); ++jj)
+  for (ii = this->begin (); ii != this->end (); ++ii)
+    for (jj = (*ii).begin (); jj != (*ii).end (); ++jj)
       (*jj).second = 0.0;
 }
 
@@ -122,7 +117,7 @@ operator * (sparse_matrix& M, const std::vector<double>& x)
   sparse_matrix::col_iterator j;
   for (unsigned int i = 0; i < M.size (); ++i)
     if (M[i].size ())
-      for (j = M[i].begin(); j != M[i].end(); ++j)
+      for (j = M[i].begin (); j != M[i].end (); ++j)
         y[i] += M.col_val (j) * x[M.col_idx (j)];
 
   return y;

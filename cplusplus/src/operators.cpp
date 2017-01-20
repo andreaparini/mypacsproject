@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 // Copyright (C) 2004-2011  Carlo de Falco
 //
 // This file is part of:
@@ -27,7 +21,7 @@
 /*! \file operators.cpp
   \brief Functions to build the discrete version of differential operators.
 */
-#include "../include/operators.hpp"
+#include <operators.h>
 #include <cstring>
 #include <stdlib.h>
 #include <algorithm>
@@ -36,10 +30,10 @@
 //{
 
 void
-bim3a_structure (const Mesh& msh, sparse_matrix& SG)
+bim3a_structure (const mesh& msh, sparse_matrix& SG)
 {
   SG.resize (msh.nnodes);
-  for (int iel = 0; iel < msh.nelem; ++iel)
+  for (int iel = 0; iel < msh.nelements; ++iel)
     for (int inode = 0; inode < 4; ++inode)
       for (int jnode = 0; jnode < 4; ++jnode)
         {
@@ -50,8 +44,8 @@ bim3a_structure (const Mesh& msh, sparse_matrix& SG)
   SG.set_properties ();
 };
 
-/*void
-bim3a_rhs (Mesh& msh,
+void
+bim3a_rhs (mesh& msh,
            const std::vector<double>& ecoeff,
            const std::vector<double>& ncoeff,
            std::vector<double>& b)
@@ -64,10 +58,10 @@ bim3a_rhs (Mesh& msh,
         int ig = msh.t (inode, iel);
         b[ig] += ncoeff[ig] * (ecoeff[iel] / 4.0) * msh.volume (iel);
       }
-};*/
+};
 
 void
-bim3a_reaction (Mesh& msh,
+bim3a_reaction (mesh& msh,
                 const std::vector<double>& ecoeff,
                 const std::vector<double>& ncoeff,
                 sparse_matrix& A)
@@ -99,7 +93,7 @@ bim3a_reaction (Mesh& msh,
 };
 
 void
-bim3a_laplacian (Mesh& msh,
+bim3a_laplacian (mesh& msh,
                  const std::vector<double>& acoeff,
                  sparse_matrix& SG)
 {
@@ -127,7 +121,7 @@ bim3a_laplacian (Mesh& msh,
 };
 
 void
-bim3a_laplacian_anisotropic (Mesh& msh,
+bim3a_laplacian_anisotropic (mesh& msh,
                              const std::vector<double>& acoeff,
                              sparse_matrix& SG)
 {
@@ -168,8 +162,8 @@ bim3a_laplacian_anisotropic (Mesh& msh,
     }
 };
 
-/*void
-bim3a_advection_diffusion (Mesh& msh,
+void
+bim3a_advection_diffusion (mesh& msh,
                            const std::vector<double>& acoeff,
                            const std::vector<double>& v,
                            sparse_matrix& SG)
@@ -201,9 +195,9 @@ bim3a_advection_diffusion (Mesh& msh,
           SG[inode[ii]][inode[jj]] += Lloc[ii + 4 * jj];
     }
 };
-*/
+
 void
-bim3a_advection_diffusion_anisotropic (Mesh& msh,
+bim3a_advection_diffusion_anisotropic (mesh& msh,
                                        const std::vector<double>& acoeff,
                                        const std::vector<double>& v,
                                        sparse_matrix& SG)
@@ -253,7 +247,7 @@ bim3a_advection_diffusion_anisotropic (Mesh& msh,
 
 
 void
-bim3a_advection_upwind (Mesh &msh,
+bim3a_advection_upwind (mesh &msh,
                         const std::vector<double>& v,
                         sparse_matrix& UP)
 {
@@ -345,7 +339,7 @@ bim3a_advection_upwind (Mesh &msh,
 };
 
 void
-bim3a_osc_laplacian (Mesh& msh,
+bim3a_osc_laplacian (mesh& msh,
                      const std::vector<double>& acoeff,
                      sparse_matrix& SG)
 {
@@ -384,7 +378,7 @@ bim3a_osc_laplacian (Mesh& msh,
 };
 
 void
-bim3a_osc_laplacian_anisotropic (Mesh& msh,
+bim3a_osc_laplacian_anisotropic (mesh& msh,
                      const std::vector<double>& acoeff,
                      sparse_matrix& SG)
 {
@@ -423,7 +417,7 @@ bim3a_osc_laplacian_anisotropic (Mesh& msh,
 };
 
 void
-bim3a_osc_advection_diffusion (Mesh& msh,
+bim3a_osc_advection_diffusion (mesh& msh,
                                const std::vector<double>& acoeff,
                                const std::vector<double>& v,
                                sparse_matrix& SG)
@@ -463,7 +457,7 @@ bim3a_osc_advection_diffusion (Mesh& msh,
 };
 
 void
-bim3a_osc_advection_diffusion_anisotropic (Mesh& msh,
+bim3a_osc_advection_diffusion_anisotropic (mesh& msh,
                       const std::vector<double>& acoeff,
                       const std::vector<double>& v,
                       sparse_matrix& SG)
@@ -1019,7 +1013,7 @@ bim3a_dirichlet_bc (sparse_matrix& M,
 }
 
 void
-bim3a_pde_gradient (Mesh& msh,
+bim3a_pde_gradient (mesh& msh,
                    const std::vector<double>& u,
                    std::vector<double>& g)
 {
@@ -1038,7 +1032,7 @@ bim3a_pde_gradient (Mesh& msh,
 }
 
 void
-bim3a_norm (Mesh& msh,
+bim3a_norm (mesh& msh,
            const std::vector<double>& v,
            double& norm,
            norm_type type)
